@@ -23,15 +23,20 @@ public class ProcessCars {
         this.wirermockClient = wirermockClient;
     }
 
-    public void process(final Integer queueCapacity) {
+    public void process(final Integer queueCapacity) throws InterruptedException {
         LOG.info("Starting process using blocking queue...");
 
         final BlockingQueue<Car> queue = new LinkedBlockingQueue<>(queueCapacity);
         final Car poisonPill = new Car("stopQueue", "stopQueue");
         List<Car> cars = create();
 
-        new Thread(new ProducerCar(queue, poisonPill, cars)).start();
-        new Thread(new ConsumerCar(queue, poisonPill, wirermockClient)).start();
+        final Thread producerThread = new Thread(new ProducerCar(queue, poisonPill, cars));
+        final Thread consumerThread = new Thread(new ConsumerCar(queue, poisonPill, wirermockClient));
+
+        producerThread.start();
+        consumerThread.start();
+        producerThread.join();
+        consumerThread.join();
 
         LOG.info("Finishing process using blocking queue...");
     }

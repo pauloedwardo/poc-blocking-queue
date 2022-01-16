@@ -22,7 +22,7 @@ public class CarsController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/execute")
-    public ResponseEntity<String> execute(@RequestParam(value = "queueCapacity") final Integer queueCapacity) {
+    public ResponseEntity<String> execute(@RequestParam(value = "queueCapacity") final Integer queueCapacity) throws InterruptedException {
         LOG.info("Starting to execute endpoint...");
 
         processCars.process(queueCapacity);
